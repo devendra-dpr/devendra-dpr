@@ -5,7 +5,7 @@
         ["How is our Staff Behaviour?", "Staff Behaviour.csv"]
     ],
     "config":{
-        "redirect_url": "",
+        "redirect_url": "https://g.page/r/CU06-Y9dEmp6EB0/review",
         "store_logo": "",
         "welcome_text" : "Welcome to Man Mandir Silk Borivali (West)."
     }
