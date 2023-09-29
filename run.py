@@ -1,12 +1,40 @@
+from datetime import datetime
 import json, csv
 from pathlib import Path
 from flask import Flask, render_template, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Integer, String, DateTime
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
 
 app = Flask(__name__)
 
 
+class Base(DeclarativeBase): pass
+
+# SQLAlchemy
+db = SQLAlchemy(model_class=Base)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.sqlite3"
+
+db.init_app(app)
+
+
+class UserClicks(db.Model):
+    __tablename__ = "user_clicks"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    store_name: Mapped[str] = mapped_column(String, nullable=False)
+    dt: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow(), nullable=False)
+
+    def __repr__(self):
+        return f"<UserClicks(id={self.id}, store_name='{self.store_name}')>"
+
+
+@app.shell_context_processor
+def make_shell_context():
+    return dict(db=db)
+
 resource_path = Path(__file__).absolute().parent / 'resources'
-# print("\n\n\nresource_path : ", type(resource_path), "\n\n\n")
 
 
 @app.route('/')
@@ -39,7 +67,11 @@ def stores(store_name):
                     render_question.append([que, {"good":good, "neutral":neutral, "bad":bad}])
             config = conf_questions.get("config")
         # print("\n\n\n render_question : ", json.dumps(render_question, indent=3), "\n\n\n")
-    return render_template('index.html', questions=render_question, store_name=store_name, config=config)
+        db.session.add(UserClicks(store_name=store_name))
+        db.session.commit()
+        return render_template('index.html', questions=render_question, store_name=store_name, config=config)
+    else:
+        return "<h1>No Store Found!</h1>"
 
 
 
