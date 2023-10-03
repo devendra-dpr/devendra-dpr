@@ -9,6 +9,7 @@ gunicorn = "*"
 eventlet = "*"
 flask-sqlalchemy = "*"
 python-dotenv = "*"
+pyyaml = "*"
 
 [dev-packages]
 

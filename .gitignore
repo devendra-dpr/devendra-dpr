@@ -248,3 +248,4 @@ cython_debug/
 nohup.out
 TODO.md
 /static/store/*
+/resources/store/*

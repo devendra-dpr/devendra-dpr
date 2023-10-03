@@ -1,5 +1,5 @@
 from datetime import datetime
-import json, csv
+import csv, yaml
 from pathlib import Path
 from flask import Flask, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
@@ -43,12 +43,12 @@ def index():
 
 @app.route('/<store_name>')
 def stores(store_name):
-    question_file:Path = resource_path / store_name / "question.json"
+    question_file:Path = resource_path / 'store' / store_name / "confQ.yml"
     render_question = []
     config = None
     if question_file.exists() and question_file.is_file():
         with open(question_file) as qf:     # Contains a list of question with question file location
-            conf_questions = json.load(qf)
+            conf_questions = yaml.load(qf, yaml.Loader)
             questions = conf_questions.get("Questions")
             if questions:
                 for que, que_file in questions:

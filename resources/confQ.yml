@@ -1,0 +1,19 @@
+# save "this" and "QuestionFormate.csv" file in "~/resources/store/STORE_NAME"
+
+# Question list with file_name of review suggestion
+Questions:
+- - Q1 ?
+  - QuestionFormate.csv
+- - Q2 ?
+  - QuestionFormate_2.csv
+-   - Q3 ?
+  - QuestionFormate_3.csv
+  
+# Config related to Reviews
+config:
+	# Google review url for redirecting
+  redirect_url: https://g.page/r/XXXX-XXXYYYZZZ/review
+  # Store_logo URL only
+  store_logo: ''
+  # Defaulr Welcome text
+  welcome_text: Welcome to My Store.
