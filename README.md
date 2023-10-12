@@ -23,3 +23,8 @@ insert into stores values(ID, STORE_NAME, MAX_CLICK_COUNT);
 -- eg.
 insert into stores values(1, "ManMandir", 20);
 ```
+## Update Store MAX_CLICK_COUNT
+```sql
+update stores set max_clicks=200 where id={ID};
+update stores set max_clicks=200 where store_name="{STORE_NAME}";
+```

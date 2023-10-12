@@ -36,209 +36,9 @@
     <!-- https://mattboldt.github.io/typed.js/docs/ -->
     <script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
 
-    <style>
-        :root {
-            --ans_img_size: 40px;
-        }
+    <script src="/static/js/main.js" defer></script>
 
-        .fs-sm {
-            font-size: small;
-        }
-        .fs-xs{
-            font-size: x-small;
-        }
-
-        .blur-bg {
-            background-color: rgba(255, 255, 255, 0.4);
-            -webkit-backdrop-filter: blur(2px);
-            backdrop-filter: blur(2.5px);
-        }
-
-        .halftone {
-            --dotSize: 0.05rem;
-            --bgSize: 2.25rem;
-            --dotColor: rgba(121, 121, 121, 0.5);
-            --bgPosition: calc(var(--bgSize) / 2);
-
-            background-image: radial-gradient(circle at center,
-                    var(--dotColor) var(--dotSize),
-                    transparent 0), radial-gradient(circle at center, var(--dotColor) var(--dotSize), transparent 0);
-            background-size: var(--bgSize) var(--bgSize);
-            background-position: 0 0, var(--bgPosition) var(--bgPosition);
-        }
-
-
-        input[type=radio] {
-            visibility: hidden;
-        }
-
-        .questions_list .question {
-            margin-bottom: 1rem;
-        }
-
-        .question input+label.ans_bad::before {
-            content: "";
-            cursor: pointer;
-            background-size: cover;
-            /* emoji-frown */
-            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23dc3545" class="bi bi-emoji-frown" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4.285 12.433a.5.5 0 0 0 .683-.183A3.498 3.498 0 0 1 8 10.5c1.295 0 2.426.703 3.032 1.75a.5.5 0 0 0 .866-.5A4.498 4.498 0 0 0 8 9.5a4.5 4.5 0 0 0-3.898 2.25.5.5 0 0 0 .183.683zM7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z"/></svg>');
-
-            
-            filter: grayscale(100%);
-            display: inline-block;
-            margin-right: 5px;
-            height: var(--ans_img_size);
-            width: var(--ans_img_size);
-        }
-
-        .question input+label:hover.ans_bad::before,
-        .question input+label:hover.ans_neutral::before,
-        .question input+label:hover.ans_good::before {
-            filter: grayscale(0%);
-        }
-
-        .question input:checked+label.ans_bad::before {
-            content: "";
-            cursor: pointer;
-            background-size: cover;
-            /* emoji-frown-fill */
-            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23dc3545" class="bi bi-emoji-frown-fill" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zM7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm-2.715 5.933a.5.5 0 0 1-.183-.683A4.498 4.498 0 0 1 8 9.5a4.5 4.5 0 0 1 3.898 2.25.5.5 0 0 1-.866.5A3.498 3.498 0 0 0 8 10.5a3.498 3.498 0 0 0-3.032 1.75.5.5 0 0 1-.683.183zM10 8c-.552 0-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5S10.552 8 10 8z"/></svg>');
-            filter: grayscale(0%);
-            display: inline-block;
-            margin-right: 5px;
-            height: var(--ans_img_size);
-            width: var(--ans_img_size);
-        }
-
-        .question input+label.ans_neutral::before {
-            content: "";
-            cursor: pointer;
-            background-size: cover;
-            /* emoji-neutral */
-            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23ffc107" class="bi bi-emoji-neutral" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4 10.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5zm3-4C7 5.672 6.552 5 6 5s-1 .672-1 1.5S5.448 8 6 8s1-.672 1-1.5zm4 0c0-.828-.448-1.5-1-1.5s-1 .672-1 1.5S9.448 8 10 8s1-.672 1-1.5z"/></svg>');
-            filter: grayscale(100%);
-            display: inline-block;
-            margin-right: 5px;
-            height: var(--ans_img_size);
-            width: var(--ans_img_size);
-        }
-
-        .question input:checked+label.ans_neutral::before {
-            content: "";
-            cursor: pointer;
-            background-size: cover;
-            /* emoji-neutral-fill */
-            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23ffc107" class="bi bi-emoji-neutral-fill" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zM7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm-3 4a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zM10 8c-.552 0-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5S10.552 8 10 8z"/></svg>');
-            filter: grayscale(0%);
-            display: inline-block;
-            margin-right: 5px;
-            height: var(--ans_img_size);
-            width: var(--ans_img_size);
-        }
-
-        .question input+label.ans_good::before {
-            content: "";
-            background-size: cover;
-            /* emoji-smile */
-            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23198754" class="bi bi-emoji-smile" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4.285 9.567a.5.5 0 0 1 .683.183A3.498 3.498 0 0 0 8 11.5a3.498 3.498 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.498 4.498 0 0 1 8 12.5a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683zM7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z"/></svg>');
-            color: green;
-            filter: grayscale(100%);
-            display: inline-block;
-            height: var(--ans_img_size);
-            width: var(--ans_img_size);
-        }
-
-        .question input:checked+label.ans_good::before {
-            content: "";
-            background-size: cover;
-            cursor: pointer;
-            /* emoji-smile-fill */
-            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23198754" class="bi bi-emoji-smile-fill" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zM7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zM4.285 9.567a.5.5 0 0 1 .683.183A3.498 3.498 0 0 0 8 11.5a3.498 3.498 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.498 4.498 0 0 1 8 12.5a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683zM10 8c-.552 0-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5S10.552 8 10 8z"/></svg>');
-            filter: grayscale(0%);
-            display: inline-block;
-            height: var(--ans_img_size);
-            width: var(--ans_img_size);
-        }
-    </style>
-    <style>
-        .welcome_image_frame{
-            height: 258px;
-            width: 194px;
-        }
-        .welcome_image_frame img{
-            height: 258px;
-            width: 194px;
-            object-fit: cover;
-            border: 4px solid white;
-            border-radius: 2px;
-        }
-        .welcome_image_frame.wl_img_0 img{
-            height: 100%;
-            width: 100%;
-            object-fit: cover;
-            border: 0px solid white;
-            border-radius: 2px;
-        }
-        .welcome_image_frame.wl_img_0{
-            transform: translate(0px, 0px);
-            -webkit-transform: translate(0px, 0px); /* Safari & Chrome */
-            -moz-transform: translate(0px, 0px); /* Firefox */
-            -ms-transform: translate(0px, 0px); /* Internet Explorer */
-            -o-transform: translate(0px, 0px); /* Opera */
-            height: 100%;
-            width: 100%;
-        }
-        .welcome_image_frame.wl_img_1{
-            transform: translate(-40px, -8px) rotate(-11.6deg);
-            -webkit-transform: translate(-40px, -8px) rotate(-11.6deg); /* Safari & Chrome */
-            -moz-transform: translate(-40px, -8px) rotate(-11.6deg); /* Firefox */
-            -ms-transform: translate(-40px, -8px) rotate(-11.6deg); /* Internet Explorer */
-            -o-transform: translate(-40px, -8px) rotate(-11.6deg); /* Opera */
-        }
-        .welcome_image_frame.wl_img_2{
-            transform: translate(-14px, 457px) rotate(-5.6deg);
-        }
-        .welcome_image_frame.wl_img_3{
-            transform: translate(-28px, 228px) rotate(13.7deg);
-            -webkit-transform: translate(-28px, 228px) rotate(13.7deg); /* Safari & Chrome */
-            -moz-transform: translate(-28px, 228px) rotate(13.7deg); /* Firefox */
-            -ms-transform: translate(-28px, 228px) rotate(13.7deg); /* Internet Explorer */
-            -o-transform: translate(-28px, 228px) rotate(13.7deg); /* Opera */
-        }
-        .welcome_text{
-            height: 250px;
-            width: 170px;
-            transform: translate(170px, 198px) rotate(0deg);
-            -webkit-transform: translate(170px, 198px) rotate(0deg);; /* Safari & Chrome */
-            -moz-transform: translate(170px, 198px) rotate(0deg);; /* Firefox */
-            -ms-transform: translate(170px, 198px) rotate(0deg);; /* Internet Explorer */
-            -o-transform: translate(170px, 198px) rotate(0deg);; /* Opera */
-            font-family: 'Libre Bodoni', serif;
-            font-weight: 400;
-        }
-        .welcome_text p{
-            font-size: 30px;
-            color: rgb(255,255,255);
-            text-shadow: 2px 2px 8px #2e2e2e;
-            line-height: 66px;
-            letter-spacing: 0em;
-            --para-spacing: 0;
-            text-transform: none;
-            --head-indent: 0;
-            --numeric-list-marker: none;
-            list-style-type: none;
-        }
-        .welcome_page_review_us{
-            left: 35%;
-            bottom: 10%;
-        }
-
-        /*  Animation  */
-        .welcome_image_frame.wl_img_0 .animate__animated.animate__fadeInDown {
-            --animate-duration: 500ms;
-        }
-    </style>
-    
+    <link rel="stylesheet" href="/static/css/style.css">    
 </head>
 
 <body class="d-flex flex-column h-100 halftone">
@@ -296,32 +96,10 @@
                         </div>
                     </div>
                     <div class="row mt-3">
-                        {% if questions %}
-                        <form class="text-center">
-                            <div class="col questions_list text-muted">
-                                {% for que in questions %}
-                                {% if que[0] %}
-                                <div class="q{{ loop.index }} question">
-                                    <h6 class="question_text p-2 ">{{ que[0] }}</h6>
-
-                                    <input type="radio" name="q{{ loop.index }}" id="q{{ loop.index }}_bad" value="bad">
-                                    <label class="ans_bad" for="q{{ loop.index }}_bad"></label>
-
-                                    <input type="radio" name="q{{ loop.index }}" id="q{{ loop.index }}_neutral"
-                                        value="neutral">
-                                    <label class="ans_neutral" for="q{{ loop.index }}_neutral"></label>
-
-                                    <input type="radio" name="q{{ loop.index }}" id="q{{ loop.index }}_good" value="good">
-                                    <label class="ans_good" for="q{{ loop.index }}_good"></label>
-                                </div>
-                                {% endif %}
-                                {% endfor %}
-                            </div>
-                            <div id="generate_review_text" class="btn btn-primary mb-2"> Generate Review </div>
+                        <form class="text-center question_form">
+                            
                         </form>
-                        {% else %}
-                        <h4 class="p-3 text-muted text-center my-4">No Questions Found!</h4>
-                        {% endif %}
+                        <h4 class="p-3 text-muted text-center my-4 question_form_error d-none">No Questions Found!</h4>
                     </div>
                 </div>
             </div>
@@ -372,85 +150,15 @@
         $(document).ready(()=>{
             let welcomeModal = new bootstrap.Modal(document.getElementById('myModal'))
             welcomeModal.show()
-            {% if config %}
             var typed = new Typed('#typing_element', {
                 strings: ['{{ config.get("welcome_text") }}'],
                 typeSpeed: 50,
                 startDelay: 300,
                 cursorChar: '',
             });
-            {% endif %}
         })
     </script>
 
-    <script>
-        $(document).ready(() => {
-            {% if questions %}
-            // Questions
-            {% for que in questions %}
-            {% if que[0] %}
-            var q{{ loop.index }}_ans_bad = {{ que[1]['bad'] | safe }}
-            var q{{ loop.index }}_ans_neutral = {{ que[1]['neutral'] | safe }}
-            var q{{ loop.index }}_ans_good = {{ que[1]['good'] | safe }}
-            {% endif %}
-            {% endfor %}
-
-
-
-            //  Generating a random review from given above list based on action of the user
-            $('#generate_review_text').click((event) => {
-                let copyReviewText = ``
-                {% for que in questions %}
-                {% if que[0] %}
-                const q{{ loop.index }}_customer_ans = $("input[type='radio'][name='q{{ loop.index }}']:checked").val();
-                {% endif %}
-                {% endfor %}
-
-
-                
-                {% for que in questions %}
-                {% if que[0] %}
-                if (q{{ loop.index }}_customer_ans != undefined) {
-                    if (q{{ loop.index }}_customer_ans == "good") {     // Review is Good
-                        const ans_index = Math.floor(Math.random() * q{{ loop.index }}_ans_good.length);
-                        copyReviewText = copyReviewText.trim() + " " + q{{ loop.index }}_ans_good[ans_index]
-                        
-                        console.log("q{{ loop.index }} Good: ", q{{ loop.index }}_ans_good[ans_index])
-                    }
-                    else if (q{{ loop.index }}_customer_ans == "neutral") {     // Review is Neutral
-                        const ans_index = Math.floor(Math.random() * q{{ loop.index }}_ans_neutral.length);
-                        copyReviewText = copyReviewText.trim() + " " + q{{ loop.index }}_ans_neutral[ans_index]
-
-                        console.log("q{{ loop.index }} Neutral: ", q{{ loop.index }}_ans_neutral[ans_index])
-                    }
-                    else if (q{{ loop.index }}_customer_ans == "bad") {     // Review is Bad
-                        const ans_index = Math.floor(Math.random() * q{{ loop.index }}_ans_bad.length);
-                        copyReviewText = copyReviewText.trim() + " " + q{{ loop.index }}_ans_bad[ans_index]
-                        console.log("q{{ loop.index }} Bad: ", q{{ loop.index }}_ans_bad[ans_index])
-                    }
-                }
-                {% endif %}
-                {% endfor %}
-
-                $('textarea').val(copyReviewText)
-                    // Copy the text inside the text field
-                    // navigator.clipboard.writeText(data);
-
-                    // Alert the copied text
-                    // alert("Copied the text: " + data);
-                let reviewCopyModal = new bootstrap.Modal(document.getElementById('reviewCopy'))
-                reviewCopyModal.show()
-            })
-
-            // Copy Review text using Library   ->  clipboard.min.js
-            var clipboard = new ClipboardJS('#cc_review_text.cc_review_text');
-            {% endif %}
-        })
-    </script>
-
-    <!-- Review         ->  https://codepen.io/fajarnurwahid/pen/MWEBMwV -->
-    <!-- Feedback Form  ->  https://blog.hubspot.com/website/feedback-form-template -->
-    <!-- Feedback Form  ->  https://codeconvey.com/feedback-form-in-html/ -->
 
 </body>
 

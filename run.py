@@ -2,7 +2,7 @@ from datetime import datetime
 import csv, yaml
 from pathlib import Path
 from typing import List
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Integer, String, DateTime, ForeignKey, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -66,9 +66,9 @@ def stores(store_name):
             conf_questions = yaml.load(qf, yaml.Loader)
             questions = conf_questions.get("Questions")
             if questions:
-                for que, que_file in questions:
+                for que in questions:
                     good, neutral, bad = [], [], []
-                    que_ans_file:Path = question_file.parent /  que_file
+                    que_ans_file:Path = question_file.parent /  que.get("sugg_file")
                     if que_ans_file.exists() and que_ans_file.is_file():
                         with open(que_ans_file) as qaf: # opening ans if Question file 
                             csv_dictreader = csv.DictReader(qaf)
@@ -90,6 +90,38 @@ def stores(store_name):
         return render_template('index.html', questions=render_question, store_name=store_name, config=config)
     else:
         return "<h1>No Store Found!</h1>"
+
+
+@app.route('/<store_name>/question')
+def store_question(store_name):
+    question_file:Path = resource_path / 'store' / store_name / "confQ.yml"
+    render_question = []
+    if question_file.exists() and question_file.is_file():
+        with open(question_file) as qf:     # Contains a list of question with question file location
+            conf_questions = yaml.load(qf, yaml.Loader)
+            questions = conf_questions.get("Questions")
+            if questions:
+                for que in questions:
+                    good, neutral, bad = [], [], []
+                    que_ans_file:Path = question_file.parent /  que.get("sugg_file")
+                    if que_ans_file.exists() and que_ans_file.is_file():
+                        with open(que_ans_file) as qaf: # opening ans if Question file 
+                            csv_dictreader = csv.DictReader(qaf)
+                            for i in csv_dictreader:
+                                if i.get('good') and i.get('good').strip():
+                                    good.append(i.get('good').strip())
+                                if i.get('neutral') and i.get('neutral').strip():
+                                    neutral.append(i.get('neutral').strip())
+                                if i.get('bad') and i.get('bad').strip():
+                                    bad.append(i.get('bad').strip()) 
+                    render_question.append({
+                        "question": que.get("question"), 
+                        "sugg": {"good":good, "neutral":neutral, "bad":bad}, 
+                        "question_type": que.get("question_type"),
+                        "staffs": que.get("staffs")})
+        return jsonify({"questions": render_question})
+    else:
+        return "No Store Found!"
 
 
 
