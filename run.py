@@ -27,7 +27,6 @@ class Stores(db.Model):
     max_clicks: Mapped[int] = mapped_column(Integer, nullable=True)
     
     user_clicks: Mapped[List["UserClicks"]] = relationship(back_populates="store")
-    # user_clicks = relationship('UserClicks', backref="store")
 
     def __repr__(self):
         return f"<Stores(id={self.id}, store_name='{self.store_name}')>"
@@ -82,7 +81,6 @@ def stores(store_name):
                                     bad.append(i.get('bad').strip()) 
                     render_question.append([que, {"good":good, "neutral":neutral, "bad":bad}])
             config = conf_questions.get("config")
-        # print("\n\n\n render_question : ", json.dumps(render_question, indent=3), "\n\n\n")
         store_ = db.session.query(Stores).filter(Stores.store_name == store_name).first()
         count = db.session.query(func.count(UserClicks.id)).scalar() # all()[0][0]
         if count and count >= store_.max_clicks:
