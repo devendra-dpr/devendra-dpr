@@ -2,12 +2,32 @@
 
 # Question list with file_name of review suggestion
 Questions:
-- - Q1 ?
-  - QuestionFormate.csv
-- - Q2 ?
-  - QuestionFormate_2.csv
--   - Q3 ?
-  - QuestionFormate_3.csv
+- question: Q1 ?
+  sugg_file: QuestionFormate.csv
+  question_type: simple_smile_rating
+
+- question: Q2 ?
+  sugg_file: QuestionFormate_2.csv
+  question_type: simple_star_rating
+
+# For Staff behaviours ratings for Staffs
+- question: Q3 ?
+  sugg_file: QuestionFormate_3.csv
+  question_type: staff_smile_rating
+  staffs:
+    - staff 1   # Name of Staff
+    - staff 2   # Name of Staff
+    - staff 3   # Name of Staff
+
+# For Staff behaviours ratings for Staffs
+- question: Q4 ?
+  sugg_file: QuestionFormate_4.csv    # here the csv not required
+  question_type: staff_star_rating
+  staffs:
+    - staff 1   # Name of Staff
+    - staff 2   # Name of Staff
+    - staff 3   # Name of Staff
+
   
 # Config related to Reviews
 config:

@@ -20,6 +20,8 @@ $(document).ready(() => {
     const generate_review_text = $('form #generate_review_text')
     const question_form_error = document.querySelector('.question_form_error')
     
+    // Review Copy Alert
+    const ReviewCopyAlert = document.querySelector('#myAlert')
     
     async function serverReq(url, method = "GET", headers = {},) {
         const resp = await fetch(url, { method, headers })
@@ -39,10 +41,11 @@ $(document).ready(() => {
             console.log("data.questions : ", data.questions)
             questions_list = data.questions
             for (let i=0; i < data.questions.length; i++){
+
                 if (data.questions[i].question_type === "simple_smile_rating"){
                     console.log("data.questions[q]question_type === simple_smile_rating", data.questions[i])
                     const q_ele = `
-                    <div class="question">
+                    <div class="question mb-3">
                         <h6 class="question_text p-2 ">${data.questions[i].question}</h6>
 
                         <input type="radio" name="q${i}-simple_smile_rating" id="q${i}_bad" value="bad">
@@ -70,9 +73,9 @@ $(document).ready(() => {
                     }
                     let q_ele = `
                         <div class="question col-12 mb-3">
-                            <h6 class="question_text p-2 pb-0 ">which of our staff was good</h6>
+                            <h6 class="question_text p-2 pb-1 mt-4">${data.questions[i].question}</h6>
                             <div class="row">
-                                <div class="col-12 mb-3">
+                                <div class="col-12 mb-2">
                                     ${q_ele_staffs}
                                 </div>
                                 <div class="col-12">
@@ -89,7 +92,38 @@ $(document).ready(() => {
                         </div>`
                     form_ele.append(q_ele)
                 }
-                else if (data.questions[i].question_type === "staff_star_rating"){}
+                else if (data.questions[i].question_type === "staff_star_rating"){
+                    console.log("data.questions[i].question_type === staff_star_rating", data.questions[i])
+                    let q_ele_staffs = ``
+                    for (let j=0; j < data.questions[i]?.staffs.length; j++){
+                        q_ele_staffs += `
+                        <input type="radio" name="q${i}-staff_star_rating-staff" id="q${i}_staff_${j}" value="${data.questions[i]?.staffs[j]}">
+                        <label class="ans_staff" for="q${i}_staff_${j}">${data.questions[i]?.staffs[j]}</label>`
+                    }
+                    let q_ele = `<div class="question col-12 mb-3">
+                        <h6 class="question_text p-2 pb-1 mt-3">${data.questions[i].question}</h6>
+                        <div class="row">
+                            <div class="col-12 mb-2">
+                                ${q_ele_staffs}
+                            </div>
+                            <div class="col-12">
+                                <div class="rating">
+                                    <input type="radio" name="q${i}-staff_star_rating" id="rating-5" value="5">
+                                    <label for="rating-5"></label>
+                                    <input type="radio" name="q${i}-staff_star_rating" id="rating-4" value="4">
+                                    <label for="rating-4"></label>
+                                    <input type="radio" name="q${i}-staff_star_rating" id="rating-3" value="3">
+                                    <label for="rating-3"></label>
+                                    <input type="radio" name="q${i}-staff_star_rating" id="rating-2" value="2">
+                                    <label for="rating-2"></label>
+                                    <input type="radio" name="q${i}-staff_star_rating" id="rating-1" value="1">
+                                    <label for="rating-1"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`
+                    form_ele.append(q_ele)
+                }
             }
             form_ele.append(`<input type="submit" id="generate_review_text" class="btn btn-primary mb-2" value="Generate Review" />`)
             // Hide the TEXT `No Questions Found!`
@@ -135,7 +169,7 @@ $(document).ready(() => {
             staff = form.get(`q${q_index}-${q_type}-staff`)
         }
 
-
+        // Getting Review Based On Review type
         if (q_type == "simple_star_rating"){       // simple_star_rating
             console.log("question is -> simple_star_rating", q_value);
         }
@@ -147,12 +181,27 @@ $(document).ready(() => {
         }
         else if (q_type == "staff_star_rating"){       // staff_star_rating
             console.log("question is -> staff_star_rating", q_value, staff);
+            const star_rating = parseInt(q_value)
+            let star_rating_text = ``
+            for (let i=1; i<=5; i++){
+                if (i <= star_rating){
+                    star_rating_text += star_fill
+                }
+                else{
+                    star_rating_text += star
+                }
+            }
+            if (staff){
+                return `\n${staff} - ${star_rating_text}`
+            }
+            else{
+                return `\nStaff Behaviour - ${star_rating_text}`
+            }
         }
         else{       // simple_smile_rating
             // console.log("question is -> simple_smile_rating", q_value);
             const review = get_sugg_review(questions_list[q_index].sugg[q_value])
             return review.trim()
-
         }
     }
 
@@ -163,7 +212,13 @@ $(document).ready(() => {
 
     // Copy Review text using Library   ->  clipboard.min.js
     var clipboard = new ClipboardJS('#cc_review_text.cc_review_text');
-
+    clipboard.on('success', function(e) {
+        ReviewCopyAlert.classList.remove('d-none')
+        setTimeout(() => {
+            ReviewCopyAlert.classList.add('d-none')
+        }, 3000);
+        // e.clearSelection();
+    });    
 
 
 

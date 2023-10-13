@@ -19,7 +19,9 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
         rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Bodoni:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Libre+Bodoni:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap"
+        rel="stylesheet">
     <!-- Javascript Bootstrap, Jquery -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js" integrity="sha384-Y4oOpwW3duJdCWv5ly8SCFYWqFDsfob/3GkgExXKV4idmbt98QcxXYs9UoXAB7BZ" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js" integrity="sha384-zYPOMqeu1DAVkHiLqWBUTcbYfZ8osu1Nd6Z89ify25QV9guujx43ITvfi12/QExE" crossorigin="anonymous"></script> -->
@@ -38,7 +40,7 @@
 
     <script src="/static/js/main.js" defer></script>
 
-    <link rel="stylesheet" href="/static/css/style.css">    
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 
 <body class="d-flex flex-column h-100 halftone">
@@ -50,16 +52,24 @@
                         <div class="container h-100" style="max-width: 470px !important;">
                             <div class="rounded shadow blur-bg bg-light h-100 position-relative overflow-hidden">
                                 <div class="welcome_image_frame position-absolute wl_img_0">
-                                    <img class="animate__animated animate__fadeInDown shadow" src="/static/store/{{store_name}}/welcome/0.jpeg" alt="welcome_page_0" srcset="">
+                                    <img class="animate__animated animate__fadeInDown shadow"
+                                        src="/static/store/{{store_name}}/welcome/0.jpeg" alt="welcome_page_0"
+                                        srcset="">
                                 </div>
                                 <div class="welcome_image_frame position-absolute wl_img_1">
-                                    <img class="animate__animated animate__fadeInLeft shadow" src="/static/store/{{store_name}}/welcome/1.jpeg" alt="welcome_page_1" srcset="">
+                                    <img class="animate__animated animate__fadeInLeft shadow"
+                                        src="/static/store/{{store_name}}/welcome/1.jpeg" alt="welcome_page_1"
+                                        srcset="">
                                 </div>
                                 <div class="welcome_image_frame position-absolute wl_img_2">
-                                    <img class="animate__animated animate__fadeInLeft shadow" src="/static/store/{{store_name}}/welcome/2.jpeg" alt="welcome_page_2" srcset="">
+                                    <img class="animate__animated animate__fadeInLeft shadow"
+                                        src="/static/store/{{store_name}}/welcome/2.jpeg" alt="welcome_page_2"
+                                        srcset="">
                                 </div>
                                 <div class="welcome_image_frame position-absolute wl_img_3">
-                                    <img class="animate__animated animate__fadeInLeft shadow" src="/static/store/{{store_name}}/welcome/3.jpeg" alt="welcome_page_3" srcset="">
+                                    <img class="animate__animated animate__fadeInLeft shadow"
+                                        src="/static/store/{{store_name}}/welcome/3.jpeg" alt="welcome_page_3"
+                                        srcset="">
                                 </div>
                                 <div>
                                     <div class="welcome_text position-absolute">
@@ -70,7 +80,8 @@
                                 </div>
                                 <div>
                                     <div class="welcome_page_review_us position-absolute">
-                                        <button type="button" class="btn btn-lg btn-light border-3" data-bs-dismiss="modal">Review Us</button>
+                                        <button type="button" class="btn btn-lg btn-light border-3"
+                                            data-bs-dismiss="modal">Review Us</button>
                                     </div>
                                 </div>
                             </div>
@@ -82,6 +93,7 @@
 
         <div class="container-fluid h-100">
             <div class="container h-100 py-5" style="max-width: 412px !important;">
+                
                 <div class="rounded shadow blur-bg">
                     <div class="row mt-2">
                         <div class="col text-muted">
@@ -89,7 +101,8 @@
                                 {% if config and config.get('store_logo') %}
                                 <img src="{{ config.get('store_logo') }}" alt="LOGO" srcset="" height="60" width="auto">
                                 {% else %}
-                                <img src="./static/store/{{store_name}}/logo.png" alt="LOGO" srcset="" height="60" width="auto">
+                                <img src="./static/store/{{store_name}}/logo.png" alt="LOGO" srcset="" height="60"
+                                    width="auto">
                                 {% endif %}
                                 <h3>&#128075; Help us improve!</h3>
                             </div>
@@ -97,6 +110,7 @@
                     </div>
                     <div class="row mt-3">
                         <form class="text-center question_form">
+                            
                             
                         </form>
                         <h4 class="p-3 text-muted text-center my-4 question_form_error d-none">No Questions Found!</h4>
@@ -109,6 +123,9 @@
         <div class="modal fade" id="reviewCopy" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
+                    <div id="myAlert" class="alert alert-info d-none" role="alert">
+                        Review copied successfully.
+                    </div>
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Generated Review</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -118,19 +135,21 @@
                         <div class="row">
                             <div class="col-12">
                                 <!-- Target -->
-                                <textarea name="copy_text_view" id="copy_text_view_textarea" cols="30" rows="10"></textarea>
+                                <textarea name="copy_text_view" id="copy_text_view_textarea" cols="30"
+                                    rows="10"></textarea>
                             </div>
                             <div class="col-12">
                                 <!-- Trigger -->
                                 <div id="cc_review_text" class="cc_review_text btn btn-secondary mb-2"
-                                data-clipboard-target="#copy_text_view_textarea"> Copy Review </div>
+                                    data-clipboard-target="#copy_text_view_textarea"> Copy Review </div>
                             </div>
                             <div class="col-12">
                                 {% if config and config.get('redirect_url') %}
                                 <a href="{{config.get('redirect_url') }}" class="btn btn-success w-75">Review Us</a>
                                 {% else %}
                                 <!-- Default Review Page of "WIFR" -->
-                                <a href="https://g.page/r/CREWgYMw6jOREBM/review" class="btn btn-success w-75">Review Us </a>
+                                <a href="https://g.page/r/CREWgYMw6jOREBM/review" class="btn btn-success w-75">Review Us
+                                </a>
                                 {% endif %}
                             </div>
                         </div>
@@ -142,12 +161,13 @@
     </main>
     <footer class="footer mt-auto py-3 blur-bg">
         <div class="container text-center">
-          <span class="text-muted fs-sm">Powered By <span class="text-dark fw-bold">WhatifRetalytics Software Services.</span> <sup class="fs-xs">v0.01</sup> </span>
+            <span class="text-muted fs-sm">Powered By <span class="text-dark fw-bold">WhatifRetalytics Software
+                    Services.</span> <sup class="fs-xs">v0.01</sup> </span>
         </div>
     </footer>
 
     <script>
-        $(document).ready(()=>{
+        $(document).ready(() => {
             let welcomeModal = new bootstrap.Modal(document.getElementById('myModal'))
             welcomeModal.show()
             var typed = new Typed('#typing_element', {
