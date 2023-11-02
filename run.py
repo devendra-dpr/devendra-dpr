@@ -4,10 +4,10 @@ from pathlib import Path
 from typing import List
 from flask import Flask, render_template, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Integer, String, DateTime, ForeignKey, func
+from sqlalchemy import Integer, String, DateTime, ForeignKey, func, Enum, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from flask_migrate import Migrate
-
+import enum
 
 app = Flask(__name__)
 
@@ -19,14 +19,25 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.sqlite3"
 db = SQLAlchemy(app=app, model_class=Base)
 migrate = Migrate(app, db)
 
+class Question_type(enum.Enum):
+    smile: str = "smile"                    # simple_smile_rating
+    star: str = "star"                      # simple_star_rating
+    staff_smile: str = "smile_rating"       # staff_smile_rating
+    staff_star: str = "star_rating"         # staff_star_rating
+
 
 class Stores(db.Model):
     __tablename__ = "stores"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    store_name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    store_name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     max_clicks: Mapped[int] = mapped_column(Integer, nullable=True)
+    redirect_url: Mapped[str] = mapped_column(String(100), nullable=False)
+    welcome_text: Mapped[str] = mapped_column(String(250), nullable=False)
+
     
     user_clicks: Mapped[List["UserClicks"]] = relationship(back_populates="store")
+    questions: Mapped[List["Questions"]] = relationship(back_populates="store")
+    review_sugg: Mapped[List["ReviewSugg"]] = relationship(back_populates="store")
 
     def __repr__(self):
         return f"<Stores(id={self.id}, store_name='{self.store_name}')>"
@@ -36,7 +47,12 @@ class UserClicks(db.Model):
     __tablename__ = "user_clicks"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    dt: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow(), nullable=False)
+    dt: Mapped[datetime] = mapped_column(
+        DateTime, 
+        default=datetime.utcnow(), 
+        nullable=False,
+        server_default=text("CURRENT_TIMESTAMP")   # returns the current date and time
+    )
     store_id: Mapped[int] = mapped_column(ForeignKey("stores.id"))
     
     store: Mapped["Stores"] = relationship(back_populates="user_clicks")
@@ -45,16 +61,67 @@ class UserClicks(db.Model):
         return f"<UserClicks(id={self.id}, store_name='{self.store.store_name}')>"
 
 
+class Questions(db.Model):
+    __tablename__ = "questions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    question: Mapped[str] = mapped_column(String, nullable=False)
+    type_: Mapped[enum.Enum] = mapped_column(
+        Enum(Question_type), 
+        default=Question_type.smile, 
+        nullable=False,
+        server_default=Question_type.smile.name
+    )
+    store_id: Mapped[int] = mapped_column(ForeignKey("stores.id"))
+    
+    store: Mapped["Stores"] = relationship(back_populates="questions")
+    review: Mapped["Reviews"] = relationship(back_populates="questions")
+    review: Mapped["ReviewSugg"] = relationship(back_populates="questions")
+
+    def __repr__(self):
+        return f"<Questions(id={self.id}, question='{self.question}')>"
+
+
+class Reviews(db.Model):
+    __tablename__ = "reviews"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    review: Mapped[str] = mapped_column(String, nullable=False)
+    question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
+
+    question: Mapped['Questions'] = relationship(back_populates="reviews")
+
+    def __repr__(self):
+        return f"<Reviews(id={self.id})>"    
+
+
+class ReviewSugg(db.Model):
+    __tablename__ = "review_sugg"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    sugg_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    store_id: Mapped[int] = mapped_column(ForeignKey("stores.id"))
+    question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
+    # review_id: Mapped[int] = mapped_column(ForeignKey("reviews.id"))
+
+    store: Mapped["Stores"] = relationship(back_populates="review_sugg")
+    question: Mapped["Questions"] = relationship(back_populates="review_sugg")
+
+    def __repr__(self):
+        return f"<ReviewSugg(id={self.id}, store_name='{self.store.store_name}')>"
+
+
 @app.shell_context_processor
 def make_shell_context():
     return dict(db=db)
-
+ 
 resource_path = Path(__file__).absolute().parent / 'resources'
 
 
 @app.route('/')
 def index():
     return redirect(url_for("stores", store_name="ManMandir"))
+
 
 @app.route('/<store_name>')
 def stores(store_name):
