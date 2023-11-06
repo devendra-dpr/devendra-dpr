@@ -19,11 +19,18 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.sqlite3"
 db = SQLAlchemy(app=app, model_class=Base)
 migrate = Migrate(app, db)
 
+
 class Question_type(enum.Enum):
     smile: str = "smile"                    # simple_smile_rating
     star: str = "star"                      # simple_star_rating
     staff_smile: str = "smile_rating"       # staff_smile_rating
     staff_star: str = "star_rating"         # staff_star_rating
+
+
+class ReviewType(enum.Enum):
+    good: str = "Good" 
+    neutral: str = "Neutral" 
+    bad: str = "Bad" 
 
 
 class Stores(db.Model):
@@ -34,7 +41,6 @@ class Stores(db.Model):
     redirect_url: Mapped[str] = mapped_column(String(100), nullable=False)
     welcome_text: Mapped[str] = mapped_column(String(250), nullable=False)
 
-    
     user_clicks: Mapped[List["UserClicks"]] = relationship(back_populates="store")
     questions: Mapped[List["Questions"]] = relationship(back_populates="store")
     review_sugg: Mapped[List["ReviewSugg"]] = relationship(back_populates="store")
@@ -75,11 +81,22 @@ class Questions(db.Model):
     store_id: Mapped[int] = mapped_column(ForeignKey("stores.id"))
     
     store: Mapped["Stores"] = relationship(back_populates="questions")
-    review: Mapped["Reviews"] = relationship(back_populates="questions")
-    review: Mapped["ReviewSugg"] = relationship(back_populates="questions")
+    reviews: Mapped[List["Reviews"]] = relationship(back_populates="questions")
+    staffs: Mapped[List["Staffs"]] = relationship(back_populates="questions")
+    review_sugg: Mapped[List["ReviewSugg"]] = relationship(back_populates="questions")
 
     def __repr__(self):
         return f"<Questions(id={self.id}, question='{self.question}')>"
+
+
+class Staffs(db.Model):
+    __tablename__ = "staffs" 
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(20), nullable=False)
+    question_id: Mapped[int] = mapped_column(ForeignKey('questions.id'), nullable=False)
+
+    questions: Mapped["Questions"] = relationship(back_populates="staffs")
 
 
 class Reviews(db.Model):
@@ -87,9 +104,13 @@ class Reviews(db.Model):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     review: Mapped[str] = mapped_column(String, nullable=False)
+    type_: Mapped[enum.Enum] = mapped_column(
+        Enum(ReviewType), 
+        nullable=False
+    )
     question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
 
-    question: Mapped['Questions'] = relationship(back_populates="reviews")
+    questions: Mapped["Questions"] = relationship(back_populates="reviews")
 
     def __repr__(self):
         return f"<Reviews(id={self.id})>"    
@@ -105,7 +126,7 @@ class ReviewSugg(db.Model):
     # review_id: Mapped[int] = mapped_column(ForeignKey("reviews.id"))
 
     store: Mapped["Stores"] = relationship(back_populates="review_sugg")
-    question: Mapped["Questions"] = relationship(back_populates="review_sugg")
+    questions: Mapped["Questions"] = relationship(back_populates="review_sugg")
 
     def __repr__(self):
         return f"<ReviewSugg(id={self.id}, store_name='{self.store.store_name}')>"
@@ -125,6 +146,8 @@ def index():
 
 @app.route('/<store_name>')
 def stores(store_name):
+    
+    # ======================================
     question_file:Path = resource_path / 'store' / store_name / "confQ.yml"
     render_question = []
     config = None
