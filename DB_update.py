@@ -19,7 +19,7 @@ st_in_txt = Stores(
     )
 db.session.add(st_in_txt)
 db.session.commit()
-
+db.session.refresh(st_in_txt)
 
 # -- Update 
 # update stores set welcome_text="welcome to my store" where id=0;
@@ -42,3 +42,27 @@ db.session.commit()
 
 # -- Query 
 # select * from Questions where store_id=1; 
+ques_q_txt = db.session.query(Questions).filter_by(store_id = "1").first()
+
+
+# add Questions
+st_in_txt = db.session.query(Stores).filter_by(store_name = "ManMandir").first()
+
+st_in_txt.questions.extend([
+    Questions(
+        question="", 
+        type_=Question_type.smile, 
+        reviews=[
+            Reviews(review="", type_=ReviewType.good),
+
+            Reviews(review="", type_=ReviewType.neutral),
+            
+            Reviews(review="", type_=ReviewType.bad),
+        ],
+        staffs=[
+            Staffs(name=""),
+        ]
+    ),
+    
+])
+db.session.commit()

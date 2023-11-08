@@ -146,7 +146,10 @@ def index():
 
 @app.route('/<store_name>')
 def stores(store_name):
-    
+    is_store =  db.session.query(Stores).filter(Stores.store_name == store_name).first()
+    questions = is_store.questions
+    print("questions : ", questions)
+    return "None"
     # ======================================
     question_file:Path = resource_path / 'store' / store_name / "confQ.yml"
     render_question = []
