@@ -53,22 +53,22 @@
                             <div class="rounded shadow blur-bg bg-light h-100 position-relative overflow-hidden">
                                 <div class="welcome_image_frame position-absolute wl_img_0">
                                     <img class="animate__animated animate__fadeInDown shadow"
-                                        src="/static/store/{{store_name}}/welcome/0.jpeg" alt="welcome_page_0"
+                                        src="/static/store/{{store.store_name}}/welcome/0.jpeg" alt="welcome_page_0"
                                         srcset="">
                                 </div>
                                 <div class="welcome_image_frame position-absolute wl_img_1">
                                     <img class="animate__animated animate__fadeInLeft shadow"
-                                        src="/static/store/{{store_name}}/welcome/1.jpeg" alt="welcome_page_1"
+                                        src="/static/store/{{store.store_name}}/welcome/1.jpeg" alt="welcome_page_1"
                                         srcset="">
                                 </div>
                                 <div class="welcome_image_frame position-absolute wl_img_2">
                                     <img class="animate__animated animate__fadeInLeft shadow"
-                                        src="/static/store/{{store_name}}/welcome/2.jpeg" alt="welcome_page_2"
+                                        src="/static/store/{{store.store_name}}/welcome/2.jpeg" alt="welcome_page_2"
                                         srcset="">
                                 </div>
                                 <div class="welcome_image_frame position-absolute wl_img_3">
                                     <img class="animate__animated animate__fadeInLeft shadow"
-                                        src="/static/store/{{store_name}}/welcome/3.jpeg" alt="welcome_page_3"
+                                        src="/static/store/{{store.store_name}}/welcome/3.jpeg" alt="welcome_page_3"
                                         srcset="">
                                 </div>
                                 <div>
@@ -98,22 +98,94 @@
                     <div class="row mt-2">
                         <div class="col text-muted">
                             <div class="header border-bottom w-100 text-center">
-                                {% if config and config.get('store_logo') %}
-                                <img src="{{ config.get('store_logo') }}" alt="LOGO" srcset="" height="60" width="auto">
-                                {% else %}
-                                <img src="./static/store/{{store_name}}/logo.png" alt="LOGO" srcset="" height="60"
-                                    width="auto">
-                                {% endif %}
+                                <img src="./static/store/{{store.store_name}}/logo.png" alt="LOGO" srcset="" height="60" width="auto">
                                 <h3>&#128075; Help us improve!</h3>
                             </div>
                         </div>
                     </div>
                     <div class="row mt-3">
-                        <form class="text-center question_form">
-                            
-                            
-                        </form>
+                        {% if questions %}
+                            <form id="question_form" class="text-center question_form", method="POST">
+                                {% for question in questions %}
+                                    {% if question.type_.name == "smile"%}
+                                    
+                                    <div class="question mb-3">
+                                        <h6 class="question_text p-2 ">{{question.question}}</h6>
+                
+                                        <input type="radio" name="{{ question.id }}" id="q_{{ question.id }}_good" value="good">
+                                        <label class="ans_good" for="q_{{ question.id }}_good"></label>
+                                        
+                                        <input type="radio" name="{{ question.id }}" id="q_{{ question.id }}_neutral" value="neutral">
+                                        <label class="ans_neutral" for="q_{{ question.id }}_neutral"></label>
+                                        
+                                        <input type="radio" name="{{ question.id }}" id="q_{{ question.id }}_bad" value="bad">
+                                        <label class="ans_bad" for="q_{{ question.id }}_bad"></label>
+                                    </div>
+                                    
+                                    {% elif question.type_.name == "star"%}
+                                    
+                                    {% elif question.type_.name == "staff_smile"%}
+                                    
+                                    <div class="question col-12 mb-3">
+                                        <h6 class="question_text p-2 pb-1 mt-3">{{question.question}}</h6>
+                                        <div class="row">
+                                            <div class="col-12 mb-2">
+
+                                                {% for staff in question.staffs %}
+                                                <input type="radio" name="{{ question.id }}-staff" id="q_{{ question.id }}" value="{{ staff.id }}">
+                                                <label class="ans_staff" for="q_{{ question.id }}">{{ staff.name }}</label>`
+                                                {% endfor %}
+
+                                            </div>
+                                            <div class="col-12">
+                                                <input type="radio" name="{{ question.id }}" id="q_{{ question.id }}_bad" value="bad">
+                                                <label class="ans_bad" for="q_{{ question.id }}_bad"></label>
+                        
+                                                <input type="radio" name="{{ question.id }}" id="q_{{ question.id }}_neutral" value="neutral">
+                                                <label class="ans_neutral" for="q_{{ question.id }}_neutral"></label>
+                        
+                                                <input type="radio" name="{{ question.id }}" id="q_{{ question.id }}_good" value="good">
+                                                <label class="ans_good" for="q_{{ question.id }}_good"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    {% elif question.type_.name == "staff_star"%}
+                                    
+                                    <div class="question col-12 mb-3">
+                                        <h6 class="question_text p-2 pb-1 mt-3">{{question.question}}</h6>
+                                        <div class="row">
+                                            <div class="col-12 mb-2">
+                                                {% for staff in question.staffs %}
+                                                <input type="radio" name="{{ question.id }}-staff" id="q_{{ question.id }}_{{ staff.id }}" value="{{ staff.id }}">
+                                                <label class="ans_staff" for="q_{{ question.id }}_{{ staff.id }}">{{ staff.name }}</label>
+                                                {% endfor %}
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="rating">
+                                                    <input type="radio" name="{{ question.id }}" id="{{ question.id }}_rating-5" value="⭐⭐⭐⭐⭐">
+                                                    <label for="{{ question.id }}_rating-5"></label>
+                                                    <input type="radio" name="{{ question.id }}" id="{{ question.id }}_rating-4" value="⭐⭐⭐⭐⚝">
+                                                    <label for="{{ question.id }}_rating-4"></label>
+                                                    <input type="radio" name="{{ question.id }}" id="{{ question.id }}_rating-3" value="⭐⭐⭐⚝⚝">
+                                                    <label for="{{ question.id }}_rating-3"></label>
+                                                    <input type="radio" name="{{ question.id }}" id="{{ question.id }}_rating-2" value="⭐⭐⚝⚝⚝">
+                                                    <label for="{{ question.id }}_rating-2"></label>
+                                                    <input type="radio" name="{{ question.id }}" id="{{ question.id }}_rating-1" value="⭐⚝⚝⚝⚝">
+                                                    <label for="{{ question.id }}_rating-1"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    {% endif %}
+                                {% endfor %}
+
+                                <input type="submit" id="generate_review_text" class="btn btn-primary mb-3" value="Generate Review" />
+                            </form>
+                        {% else %}
                         <h4 class="p-3 text-muted text-center my-4 question_form_error d-none">No Questions Found!</h4>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -144,8 +216,8 @@
                                     data-clipboard-target="#copy_text_view_textarea"> Copy Review </div>
                             </div>
                             <div class="col-12">
-                                {% if config and config.get('redirect_url') %}
-                                <a href="{{config.get('redirect_url') }}" class="btn btn-success w-75">Review Us</a>
+                                {% if store %}
+                                <a href="{{ store.redirect_url }}" class="btn btn-success w-75">Review Us</a>
                                 {% else %}
                                 <!-- Default Review Page of "WIFR" -->
                                 <a href="https://g.page/r/CREWgYMw6jOREBM/review" class="btn btn-success w-75">Review Us
@@ -171,7 +243,7 @@
             let welcomeModal = new bootstrap.Modal(document.getElementById('myModal'))
             welcomeModal.show()
             var typed = new Typed('#typing_element', {
-                strings: ['{{ config.get("welcome_text") }}'],
+                strings: ['{{ store.welcome_text }}'],
                 typeSpeed: 50,
                 startDelay: 300,
                 cursorChar: '',

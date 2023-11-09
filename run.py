@@ -2,7 +2,7 @@ from datetime import datetime
 import csv, yaml
 from pathlib import Path
 from typing import List
-from flask import Flask, render_template, redirect, url_for, jsonify
+from flask import Flask, render_template, redirect, url_for, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Integer, String, DateTime, ForeignKey, func, Enum, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -23,14 +23,14 @@ migrate = Migrate(app, db)
 class Question_type(enum.Enum):
     smile: str = "smile"                    # simple_smile_rating
     star: str = "star"                      # simple_star_rating
-    staff_smile: str = "smile_rating"       # staff_smile_rating
-    staff_star: str = "star_rating"         # staff_star_rating
+    staff_smile: str = "staff_smile"       # staff_smile_rating
+    staff_star: str = "staff_star"         # staff_star_rating
 
 
 class ReviewType(enum.Enum):
-    good: str = "Good" 
-    neutral: str = "Neutral" 
-    bad: str = "Bad" 
+    good: str = "good" 
+    neutral: str = "neutral" 
+    bad: str = "bad"
 
 
 class Stores(db.Model):
@@ -121,6 +121,10 @@ class ReviewSugg(db.Model):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     sugg_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    type_: Mapped[enum.Enum] = mapped_column(
+        Enum(ReviewType), 
+        nullable=False
+    )
     store_id: Mapped[int] = mapped_column(ForeignKey("stores.id"))
     question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
     # review_id: Mapped[int] = mapped_column(ForeignKey("reviews.id"))
@@ -144,78 +148,46 @@ def index():
     return redirect(url_for("stores", store_name="ManMandir"))
 
 
-@app.route('/<store_name>')
+@app.route('/<store_name>', methods=['GET', "POST"])
 def stores(store_name):
-    is_store =  db.session.query(Stores).filter(Stores.store_name == store_name).first()
-    questions = is_store.questions
-    print("questions : ", questions)
-    return "None"
-    # ======================================
-    question_file:Path = resource_path / 'store' / store_name / "confQ.yml"
-    render_question = []
-    config = None
-    if question_file.exists() and question_file.is_file():
-        with open(question_file) as qf:     # Contains a list of question with question file location
-            conf_questions = yaml.load(qf, yaml.Loader)
-            questions = conf_questions.get("Questions")
-            if questions:
-                for que in questions:
-                    good, neutral, bad = [], [], []
-                    que_ans_file:Path = question_file.parent /  que.get("sugg_file")
-                    if que_ans_file.exists() and que_ans_file.is_file():
-                        with open(que_ans_file) as qaf: # opening ans if Question file 
-                            csv_dictreader = csv.DictReader(qaf)
-                            for i in csv_dictreader:
-                                if i.get('good') and i.get('good').strip():
-                                    good.append(i.get('good').strip())
-                                if i.get('neutral') and i.get('neutral').strip():
-                                    neutral.append(i.get('neutral').strip())
-                                if i.get('bad') and i.get('bad').strip():
-                                    bad.append(i.get('bad').strip()) 
-                    render_question.append([que, {"good":good, "neutral":neutral, "bad":bad}])
-            config = conf_questions.get("config")
-        store_ = db.session.query(Stores).filter(Stores.store_name == store_name).first()
-        count = db.session.query(func.count(UserClicks.id)).scalar() # all()[0][0]
-        if count and count >= store_.max_clicks:
-            return "<h1>You Trial Limit have been Completed.</h1>"
-        store_.user_clicks.append(UserClicks())
-        db.session.commit()
-        return render_template('index.html', questions=render_question, store_name=store_name, config=config)
-    else:
-        return "<h1>No Store Found!</h1>"
-
-
-@app.route('/<store_name>/question')
-def store_question(store_name):
-    question_file:Path = resource_path / 'store' / store_name / "confQ.yml"
-    render_question = []
-    if question_file.exists() and question_file.is_file():
-        with open(question_file) as qf:     # Contains a list of question with question file location
-            conf_questions = yaml.load(qf, yaml.Loader)
-            questions = conf_questions.get("Questions")
-            if questions:
-                for que in questions:
-                    good, neutral, bad = [], [], []
-                    que_ans_file:Path = question_file.parent /  que.get("sugg_file")
-                    if que_ans_file.exists() and que_ans_file.is_file():
-                        with open(que_ans_file) as qaf: # opening ans if Question file 
-                            csv_dictreader = csv.DictReader(qaf)
-                            for i in csv_dictreader:
-                                if i.get('good') and i.get('good').strip():
-                                    good.append(i.get('good').strip())
-                                if i.get('neutral') and i.get('neutral').strip():
-                                    neutral.append(i.get('neutral').strip())
-                                if i.get('bad') and i.get('bad').strip():
-                                    bad.append(i.get('bad').strip()) 
-                    render_question.append({
-                        "question": que.get("question"), 
-                        "sugg": {"good":good, "neutral":neutral, "bad":bad}, 
-                        "question_type": que.get("question_type"),
-                        "staffs": que.get("staffs")})
-        return jsonify({"questions": render_question})
-    else:
-        return "No Store Found!"
-
+    if request.method == "POST":
+        generated_review = []
+        print("request.form :-> ", request.json)
+        form_data = request.json
+        for i in form_data:
+            try:
+                print(i)
+                question = db.session.query(Questions).filter(Questions.id == int(i)).first()
+                print("question : ", question)
+                if question.type_ == Question_type.staff_star:
+                    staff_info = db.session.query(Staffs).filter(Staffs.id == int(form_data[i+"-staff"]) ).first()
+                    star_review = f"{staff_info.name} - {form_data[i]}"
+                    generated_review.append(star_review)
+                    continue
+                if question.type_ == Question_type.smile:
+                    rev_lists = db.session.query(Reviews).filter(Reviews.question_id == question.id).filter(Reviews.type_ ==  ReviewType(form_data[i]) ).all()
+                    review_count = len(rev_lists)
+                    rev_sugg = db.session.query(ReviewSugg).filter(ReviewSugg.question_id == question.id).filter(ReviewSugg.type_ == ReviewType(form_data[i])).first()
+                    if rev_sugg:
+                        txt_review_tmp = rev_lists[rev_sugg.sugg_count%review_count].review
+                        generated_review.append(txt_review_tmp)
+                        rev_sugg.sugg_count = rev_sugg.sugg_count + 1
+                        db.session.commit()
+                    else:
+                        db.session.add(
+                            ReviewSugg(sugg_count=1, type_= ReviewType(form_data[i]), store_id=question.store.id, question_id=question.id)
+                        )
+                        db.session.commit()
+                        txt_review_tmp = rev_lists[0].review
+                        generated_review.append(txt_review_tmp)
+            except Exception as e:
+                print("Exception :- ", e)
+        return ".\n".join(generated_review)
+    else:       # Get and other methods
+        print("store_name : ", store_name)
+        is_store =  db.session.query(Stores).filter(Stores.store_name == store_name).first()
+        print("questions : ", is_store.questions)
+        return render_template('index.html', questions=is_store.questions, store=is_store)
 
 
 if __name__ == "__main__":
